@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Gimme a token</title>
+    <style>
+        input,textarea {width: 500px}
+        input[type=submit],input[type=button] {width:100px;background-color:#32cd32}
+    </style>
+</head>
+<body>
+
+<h1>Homebrew Access Token</h1>
+
+This page helps you to <a href="https://indieweb.org/obtaining-an-access-token">obtain an access token</a> for <a href="https://indieweb.org/IndieAuth">IndieAuth</a>, that you can use with home-made Micropub clients in IFTTT, Workflow and the like.<br> This page looks hacky on purpose, use at your own risk. Needs javascript, because it works on your own computer.<br>You can also save this HTML page to your own computer first, if that makes you feel safer.
+
+<hr>
+
+<b>Step 1</b> fill out this form:
+
+<form action="https://indieauth.com/auth" id="form1" target="_blank">
+
+    <p>
+        Auth Endpoint:<br>
+        <input type="url" value="https://indieauth.com/auth" onblur="document.getElementById('form1').action = this.value" /><br>
+        What is your Authorization Endpoint? You can find this by looking for <code>rel="authorization_endpoint"</code> if you view the source of your homepage.
+    </p>
+
+    <p>
+        me:<br>
+        <input type="url" name="me" value="http://example.com" onblur="document.getElementById('me').value = this.value"/><br>
+        For what user(URL) are you asking for permission? (Usually your domain name)
+    </p>
+
+    <p>
+        client_id:<br>
+        <input type="url" name="client_id" value="https://gimme-a-token.5eb.nl/" onblur="document.getElementById('client_id').value = this.value" /><br>
+        The URL (must be a URL) of the app you request a token for.
+    </p>
+
+    <p>
+        scope:<br>
+        <input type="text" name="scope" value="create update"/><br>
+        A space-separated list of things you would like to request permission for.
+    </p>
+
+    <p>
+        <input type="submit" value="To login">
+        After clicking the button, a new window will open, where you will be redirected to your Auth Endpoint. There you can sign in and approve the new token.
+        <input type="hidden" name="response_type" value="code"/>
+        <input type="hidden" name="redirect_uri" id="redirect_uri" value="http://nonexisting-domain.dev/callback"/><br>
+        After the signing, you will be redirected to <code>http://nonexisting-domain.dev/callback</code>, which does not exist. This is on purpose. See step 2.
+    </p>
+
+</form>
+
+<hr>
+
+<b>Step 2</b> Getting the code
+
+<form action="https://tokens.indieauth.com/token" id="form2" method="POST" target="_blank">
+
+    <p>
+        On the other window, you will see you're at the following address / URL:<br>
+
+        <code>
+        http://nonexisting-domain.dev/callback?code=xxx&amp;me=http%3A%2F%2Fexample.com%2F
+        </code><br>
+
+        ... where 'xxx' is the code, which we need here:
+    </p>
+
+    <p>
+        Code:<br>
+        <textarea name="code" onblur="this.value = decodeURIComponent(this.value)" rows="5"></textarea><br>
+        Make sure to remove the <code>&amp;me=</code>! Field will URL-decode for you. (<code>%3D</code> to <code>=</code> etc.)
+    </p>
+
+    <p>
+        Token Endpoint:<br>
+        <input type="text" id="token_endpoint" value="https://tokens.indieauth.com/token" onblur="document.getElementById('form2').action = this.value"><br>
+        We also need your token endpoint, so it can give you an access token.
+    </p>
+
+    <p>
+        This value should have changed to what you have above:<br>
+        <input type="url" name="me" value="http://example.com/" id="me" readonly /> Me<br>
+        <input type="url" name="client_id" value="https://gimme-a-token.5eb.nl/" id="client_id" readonly /> Client ID<br>
+
+        <input type="hidden" name="grant_type" value="authorization_code"/>
+        <input type="hidden" name="redirect_uri" value="http://nonexisting-domain.dev/callback"/>
+    </p>
+
+    <p>
+        <input type="submit" value="Download token">
+        After clicking on &quot;Go!&quot;, another new window will open, this time with your new access token (and some other stuff). Your browser might attempt to download a file, just download it and open it with a text editor.
+    </p>
+
+    <p>
+        You will see something like this:<br>
+        <code>me=http%3A%2F%2Fexample.com%2F&amp;scope=create+update&amp;access_token=xxx</code><br>
+        Where 'xxx' is your access token. Have fun with it, and remember: that thing is your password. Use it wise.
+    </p>
+
+</form>
+
+</body>
+</html>
