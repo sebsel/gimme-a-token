@@ -1,16 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Gimme a token</title>
-    <style>
-        input,textarea {width: 500px}
-        input[type=submit],input[type=button] {width:100px;background-color:#32cd32}
-    </style>
+  <meta charset="UTF-8" />
+  <title>Gimme a token</title>
+  <style>
+    body {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    h3 {
+      margin-bottom: .3em;
+    }
+    h4 {
+      margin: 0;
+    }
+    p {
+      margin: 0;
+      margin-bottom: .5em;
+    }
+    hr {
+      margin-top: 5em;
+      border: none;
+      border-bottom: 1px solid black;
+    }
+    input, textarea {
+      width: 100%;
+      max-width: 600px;
+      font-size: 14px;
+      margin-bottom: .5em;
+    }
+    input[type=submit], input[type=button], button, a.button {
+      width: auto;
+      min-width: 150px;
+      display: inline-block;
+      border-radius: 3px;
+      text-decoration: none;
+      text-align: center;
+      font-family: sans-serif;
+      padding: 8px 12px;
+      font-size: 14px;
+      color: black;
+      cursor: pointer;
+      border: solid 2px grey;
+      background-color: #ccc;
+    }
+    .main {
+      border: solid 2px green !important;
+      background-color: #32cd32 !important;
+    }
+    form {
+      margin-top: .5em;
+    }
+    #state-warning, #state-success {
+      padding: 3px 8px;
+      border-radius: 3px;
+    }
+    #state-warning {
+      color: #721c24;
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+    }
+    #state-success {
+      color: #155724;
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+    }
+    [hidden] { display: none; }
+  </style>
 </head>
 <body>
 
-<h1>Homebrew Access Token</h1>
+<h1>Gimme an Access Token</h1>
 
 This page helps you to <a href="https://indieweb.org/obtaining-an-access-token">obtain an access token</a>
 or <a href="https://indieweb.org/IndieAuth">IndieAuth</a>, that you can use with home-made Micropub clients
@@ -23,91 +83,221 @@ See <a href="https://github.com/sebsel/gimme-a-token">the code</a> or file an <a
 
 <b>Step 1</b> fill out this form:
 
-<form action="https://indieauth.com/auth" id="form1" target="_blank">
+<form action="https://indieauth.com/auth" id="step-1" target="_blank">
 
-    <p>
-        Auth Endpoint:<br>
-        <input type="url" value="https://indieauth.com/auth" onblur="document.getElementById('form1').action = this.value" /><br>
-        What is your Authorization Endpoint? You can find this by looking for <code>rel="authorization_endpoint"</code> if you view the source of your homepage.
-    </p>
+  <h3>Me</h3>
+  <p>
+  <input type="url" name="me" id="me" value="http://example.com" onblur="syncMe(this.value)" /><br>
+  IndieAuth works with URLs to identify yourself online. What is the URL you want to use to identify with? Usually, this is the URL of your homepage.
+  </p>
 
-    <p>
-        me:<br>
-        <input type="url" name="me" value="http://example.com" onblur="document.getElementById('me').value = this.value"/><br>
-        For what user(URL) are you asking for permission? (Usually your domain name)
-    </p>
+  <h3>Authorization Endpoint</h3>
+  <p>
+  <input type="url" value="https://indieauth.com/auth" onblur="syncAuthEndpoint(this.value)" /><br>
+  What is your Authorization Endpoint? You can find this by looking for <code>rel="authorization_endpoint"</code> if you view the source of your homepage.
+  </p>
+  <p>
+  You can also use <a href="https://indieweb-endpoints.cc" rel="nofollow">indieweb-endpoints.cc</a> or <a href="https://xray.p3k.io/" rel="nofollow">XRay</a> to find
+  it for you, based on your me-URL. Look for the <code>authorization_endpoint</code> value, but also look for the <code>token_endpoint</code> while you're at it: you need it in step 2.
+  </p>
+  <p hidden id="discover">
+  <a href="https://indieweb-endpoints.cc/" id="discover-endpoints" class="button main" rel="nofollow" target="_blank">use IndieWeb Endpoints</a>
+  <a href="https://xray.p3k.io/rels?url=" id="discover-xray" class="button main" rel="nofollow" target="_blank">use XRay</a>
+  for <code id="discover-url"></code>
+  </p>
+  <p id="discover-button">
+  <button type="button" onclick="syncMe(document.getElementById('me').value)">Show buttons based on 'me' value</button>
+  </p>
 
-    <p>
-        client_id:<br>
-        <input type="url" name="client_id" value="https://gimme-a-token.5eb.nl/" onblur="document.getElementById('client_id').value = this.value" /><br>
-        The URL (must be a URL) of the app you request a token for.
-    </p>
+  <h3>Client ID</h3>
+  <p>
+  <input type="url" name="client_id" value="https://gimme-a-token.5eb.nl/" onblur="syncClientId(this.value)" /><br>
+  The URL of the app you request a token for. This is more for administration purposes, but it's good to pick a sensible one.
+  </p>
 
-    <p>
-        scope:<br>
-        <input type="text" name="scope" value="create update"/><br>
-        A space-separated list of things you would like to request permission for.
-    </p>
+  <h3>Scope</h3>
+  <p>
+  <input type="text" name="scope" value="create update"/><br>
+  A space-separated list of things you would like to request permission for.
+  </p>
 
-    <p>
-        <input type="submit" value="To login">
-        After clicking the button, a new window will open, where you will be redirected to your Auth Endpoint. There you can sign in and approve the new token.
-        <input type="hidden" name="response_type" value="code"/>
-        <input type="hidden" name="redirect_uri" id="redirect_uri" value="http://nonexisting-domain.invalid/callback"/><br>
-        After the signing, you will be redirected to <code>http://nonexisting-domain.invalid/callback</code>, which does not exist. This is on purpose. See step 2.
-    </p>
+  <h3>State</h3>
+  <p>
+  <input type="text" name="state" id="state" required/><br>
+  This field is set to a set of random characters. You can leave it as is. This parameter makes sure no-one sits between this page and the Authorization Endpoint.
+  You can also pick your own random characters if that makes you feel safer.
+  </p>
+
+  <h3>More values</h3>
+  <p>
+  The following fields are also needed for your endpoint, but you can safely ignore them here: we're just showing them for transparency.
+  </p>
+  <h4>Response Type</h4>
+  <input type="text" name="response_type" value="code" readonly/>
+  <h4>Redirect URI</h4>
+  <input type="text" name="redirect_uri" id="redirect_uri" value="http://nonexisting-domain.invalid/callback" readonly/>
+
+  <p>
+  <input type="submit" class="main" value="To login">
+  <br>
+  Clicking on the button will send the above fields to the specified Authorization Endpoint. There you can sign in and approve the new token.
+  After the signing, you will be redirected to <code>http://nonexisting-domain.invalid/callback</code>, which does not exist. This is on purpose. See step 2.
+  </p>
 
 </form>
 
 <hr>
-
 <b>Step 2</b> Getting the code
 
-<form action="https://tokens.indieauth.com/token" id="form2" method="POST" target="_blank">
+<form action="https://tokens.indieauth.com/token" id="step-2" method="POST" target="_blank">
 
-    <p>
-        On the other window, you will see you're at the following address / URL:<br>
+  <h3>Redirected URL</h3>
+  <p>
+  On the other window, you will see an empty window for a non-existing page, on a url similar to this one:
 
-        <code>
-        http://nonexisting-domain.invalid/callback?code=xxx&amp;me=http%3A%2F%2Fexample.com%2F
-        </code><br>
+  <code>
+    http://nonexisting-domain.invalid/callback?code=xxx&amp;me=http%3A%2F%2Fexample.com%2F
+  </code><br>
 
-        ... where 'xxx' is the code, which we need here:
-    </p>
+  ... where 'xxx' is the code, which we need. You can paste the URL into this box and press the button, which will do some URL-parsing and URL-decoding for you.
+  It will also verify the state.
+  </p>
+  <p>
+  <textarea id="redirected-url" rows="5"></textarea><br>
+  <button type="button" onclick="parseRedirectedUrl()">Parse</button>
+  </p>
+  <div hidden id="state-warning"><strong>Watch out!</strong>
+    The state does not match up! Someone is trying to mess with you.
+    Or did you refresh this page? That changes the state too.
+  </div>
+  <div hidden id="state-success">The state parameter is valid.</div>
 
-    <p>
-        Code:<br>
-        <textarea name="code" onblur="this.value = decodeURIComponent(this.value)" rows="5"></textarea><br>
-        Make sure to remove the <code>&amp;me=</code>! Field will URL-decode for you. (<code>%3D</code> to <code>=</code> etc.)
-    </p>
+  <hr>
+  <b>Step 3</b> Getting the token
 
-    <p>
-        Token Endpoint:<br>
-        <input type="text" id="token_endpoint" value="https://tokens.indieauth.com/token" onblur="document.getElementById('form2').action = this.value"><br>
-        We also need your token endpoint, so it can give you an access token.
-    </p>
+  <h3>Code</h3>
+  <p>
+  <textarea name="code" id="code" rows="5"></textarea><br>
+  This field should have been filled in after you clicked the button above. You can leave it here.
+  </p>
 
-    <p>
-        This value should have changed to what you have above:<br>
-        <input type="url" name="me" value="http://example.com/" id="me" readonly /> Me<br>
-        <input type="url" name="client_id" value="https://gimme-a-token.5eb.nl/" id="client_id" readonly /> Client ID<br>
+  <h3>Token Endpoint</h3>
+  <p>
+  <input type="text" id="token_endpoint" value="https://tokens.indieauth.com/token" onblur="syncTokenEndpoint(this.value)"><br>
+  This is the place where we will send your code to, so you can download the token. You can discover this the same way as you did
+  with the Authorization Endpoint, but now looking for the <code>token_endpoint</code> rel value.
+  </p>
 
-        <input type="hidden" name="grant_type" value="authorization_code"/>
-        <input type="hidden" name="redirect_uri" value="http://nonexisting-domain.invalid/callback"/>
-    </p>
+  <h3>More values</h3>
+  <p>
+  These values come from step 1, and should have changed to what you filled in there. You can leave them as is.
+  </p>
+  <h4>Me</h4>
+  <input type="url" name="me" value="http://example.com/" id="step-2-me" readonly />
+  <h4>Client ID</h4>
+  <input type="url" name="client_id" value="https://gimme-a-token.5eb.nl/" id="step-2-client_id" readonly />
+  <h4>Grant Type</h4>
+  <input type="text" name="grant_type" value="authorization_code" readonly/>
+  <h4>Redirect URI</h4>
+  <input type="text" name="redirect_uri" value="http://nonexisting-domain.invalid/callback" readonly/>
 
-    <p>
-        <input type="submit" value="Download token">
-        After clicking on &quot;Go!&quot;, another new window will open, this time with your new access token (and some other stuff). Your browser might attempt to download a file, just download it and open it with a text editor.
-    </p>
+  <p>
+  <input type="submit" class="main" value="Download token"><br>
+  After clicking on &quot;Download token&quot;, another new window will open, this time with your new access token (and some other stuff).
+  Depending on how your token endpoint is set up, your browser might attempt to download a file. You can just download it and open it with a text editor.
+  </p>
 
-    <p>
-        You will see something like this:<br>
-        <code>me=http%3A%2F%2Fexample.com%2F&amp;scope=create+update&amp;access_token=xxx</code><br>
-        Where 'xxx' is your access token. Have fun with it, and remember: that thing is your password. Use it wise.
-    </p>
-
+  You will see something like this:
+  <pre><code>
+    {
+      "access_token": "XXXXXX",
+      "token_type": "Bearer",
+      "scope": "create update",
+      "me": "https://user.example.net/"
+    }
+  </code></pre>
+  Where 'xxx' is your access token. Have fun with it, but remember: <strong>that thing is your password</strong>. Use it wise.
 </form>
 
+<br><br>
+<button onclick="document.getElementById('extra-box').removeAttribute('hidden')">Weird response?</button>
+<div hidden id="extra-box">
+  <br><br>
+  Seems like you hit an older token endpoint. No probs, here is another box to decode it!
+
+  <h3>Response</h3>
+  <textarea id="token-response" rows="5"></textarea><br>
+  <button type="button" onclick="parseTokenResponse()">Parse</button>
+  <h3>Access Token</h3>
+  <textarea id="access-token" rows="5"></textarea><br>
+  Again: this is your password, use it wise.
+</div>
+
+<hr>
+by <a href="https://seblog.nl/">Sebastiaan Andeweg</a> | <a href="https://github.com/sebsel/gimme-a-token">Source</a> | <a href="https://github.com/sebsel/gimme-a-token/issues">Issues</a>
+
+<script>
+  function syncMe(value) {
+    document.getElementById('step-2-me').value = value;
+    document.getElementById('discover-xray').href = 'https://xray.p3k.io/rels?url=' + encodeURIComponent(value);
+    document.getElementById('discover-endpoints').href = 'https://indieweb-endpoints.cc/search?url=' + encodeURIComponent(value);
+    document.getElementById('discover-url').innerText = value;
+    document.getElementById('discover').removeAttribute('hidden');
+    document.getElementById('discover-button').setAttribute('hidden', true);
+  }
+  function syncAuthEndpoint(value) {
+    document.getElementById('step-1').action = value;
+  }
+  function syncTokenEndpoint(value) {
+    document.getElementById('step-2').action = value;
+  }
+  function syncClientId(value) {
+    document.getElementById('step-2-client_id').value = value;
+  }
+  function parseRedirectedUrl() {
+    var url = document.getElementById('redirected-url').value;
+    var state = findQueryParam(url, 'state');
+    if (document.getElementById('state').value === state) {
+      document.getElementById('state-success').removeAttribute('hidden');
+      document.getElementById('state-warning').setAttribute('hidden', true);
+    } else {
+      document.getElementById('state-warning').removeAttribute('hidden');
+      document.getElementById('state-success').setAttribute('hidden', true);
+    }
+    document.getElementById('code').value = findQueryParam(url, 'code');
+  }
+  function parseTokenResponse() {
+    var response = '?' + document.getElementById('token-response').value;
+    document.getElementById('access-token').value = findQueryParam(response, 'access_token');
+  }
+  function findQueryParam(url, field) {
+    var result = 'unable to find ' + field;
+    try {
+      var vars = url.split('?')[1].split('&');
+      for (var i = 0; i < vars.length; i++) {
+        console.log(vars)
+        var pair = vars[i].split('=');
+        if (pair[0] === field) {
+          result = decodeURIComponent(pair[1]);
+          break;
+        }
+      }
+    } catch(e) {
+      console.error(e, url, vars);
+    }
+    return result;
+  }
+  function ready(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") fn();
+    else document.addEventListener('DOMContentLoaded', fn);
+  }
+  function randomString() {
+    return Math.random().toString(36).substring(7);
+  }
+  function setState() {
+    document.getElementById('state').value = randomString() + randomString() + randomString() + randomString();
+  }
+  ready(setState);
+</script>
 </body>
 </html>
