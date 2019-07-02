@@ -53,8 +53,8 @@ See <a href="https://github.com/sebsel/gimme-a-token">the code</a> or file an <a
         <input type="submit" value="To login">
         After clicking the button, a new window will open, where you will be redirected to your Auth Endpoint. There you can sign in and approve the new token.
         <input type="hidden" name="response_type" value="code"/>
-        <input type="hidden" name="redirect_uri" id="redirect_uri" value="http://nonexisting-domain.dev/callback"/><br>
-        After the signing, you will be redirected to <code>http://nonexisting-domain.dev/callback</code>, which does not exist. This is on purpose. See step 2.
+        <input type="hidden" name="redirect_uri" id="redirect_uri" value="http://nonexisting-domain.invalid/callback"/><br>
+        After the signing, you will be redirected to <code>http://nonexisting-domain.invalid/callback</code>, which does not exist. This is on purpose. See step 2.
     </p>
 
 </form>
@@ -69,7 +69,7 @@ See <a href="https://github.com/sebsel/gimme-a-token">the code</a> or file an <a
         On the other window, you will see you're at the following address / URL:<br>
 
         <code>
-        http://nonexisting-domain.dev/callback?code=xxx&amp;me=http%3A%2F%2Fexample.com%2F
+        http://nonexisting-domain.invalid/callback?code=xxx&amp;me=http%3A%2F%2Fexample.com%2F
         </code><br>
 
         ... where 'xxx' is the code, which we need here:
@@ -93,7 +93,7 @@ See <a href="https://github.com/sebsel/gimme-a-token">the code</a> or file an <a
         <input type="url" name="client_id" value="https://gimme-a-token.5eb.nl/" id="client_id" readonly /> Client ID<br>
 
         <input type="hidden" name="grant_type" value="authorization_code"/>
-        <input type="hidden" name="redirect_uri" value="http://nonexisting-domain.dev/callback"/>
+        <input type="hidden" name="redirect_uri" value="http://nonexisting-domain.invalid/callback"/>
     </p>
 
     <p>
