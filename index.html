@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <title>Gimme a token</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       max-width: 600px;
       margin: 0 auto;
+      padding: 2px;
     }
     h3 {
       margin-bottom: .3em;
@@ -24,10 +26,12 @@
       border-bottom: 1px solid black;
     }
     input, textarea {
-      width: 100%;
-      max-width: 600px;
-      font-size: 14px;
+      width: calc(100% - 16px);
+      padding: 3px 6px;
+      margin: 0 auto;
       margin-bottom: .5em;
+      font-size: 14px;
+      -webkit-appearance: none;
     }
     input[type=submit], input[type=button], button, a.button {
       width: auto;
