@@ -124,6 +124,12 @@ See <a href="https://github.com/sebsel/gimme-a-token">the code</a> or file an <a
   <p>
   <input type="url" name="client_id" value="https://gimme-a-token.5eb.nl/" onblur="syncClientId(this.value)" /><br>
   The URL of the app you request a token for. This is more for administration purposes, but it's good to pick a sensible one.
+  It is important that it's on <code>http://</code> or <code>https://</code> and it must have a path, so end in with a slash (<code>/</code>) if you only choose a domain.
+  </p>
+  <p>
+  <strong>Note</strong>: servers will try to fetch this URL to verify the <code>redirect_uri</code> (see below).<br>
+  Gimme-a-token.5eb.nl will advertize the <code>redirect_uri</code> as shown below to them. If you pick another <code>client_id</code>, some servers might try to protect you
+  and not allow authorization, because the <code>redirect_uri</code> is on a different domain than your <code>client_id</code>.
   </p>
 
   <h3>Scope</h3>
