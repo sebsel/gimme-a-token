@@ -145,13 +145,13 @@ See <a href="https://github.com/sebsel/gimme-a-token">the code</a> or file an <a
   <h4>Response Type</h4>
   <input type="text" name="response_type" value="code" readonly/>
   <h4>Redirect URI</h4>
-  <input type="text" name="redirect_uri" id="redirect_uri" value="http://nonexisting-domain.invalid/callback" readonly/>
+  <input type="text" name="redirect_uri" id="redirect_uri" value="https://nonexisting-domain.invalid/callback" readonly/>
 
   <p>
   <input type="submit" class="main" value="To login">
   <br>
   Clicking on the button will send the above fields to the specified Authorization Endpoint. There you can sign in and approve the new token.
-  After the signing, you will be redirected to <code>http://nonexisting-domain.invalid/callback</code>, which does not exist. This is on purpose. See step 2.
+  After the signing, you will be redirected to <code>https://nonexisting-domain.invalid/callback</code>, which does not exist. This is on purpose. See step 2.
   </p>
 
 </form>
